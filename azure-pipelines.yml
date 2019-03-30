@@ -29,6 +29,7 @@ steps:
   displayName: 'Publish Test Results'
   condition: always()
   inputs:
+    testResultsFiles: 
     testResultsFormat: NUnit
     searchFolder: '$(Common.TestResultsDirectory)'
     mergeTestResults: true
@@ -36,6 +37,12 @@ steps:
 - task: CopyFiles@2
   displayName: 'Copy Files to: Build '
   inputs:
+    Contents: '*'
     SourceFolder: Output
     TargetFolder: $(Build.StagingDirectory)
     CleanTargetFolder: true
+
+- task: PublishPipelineArtifact@0
+  inputs:
+    artifactName: 'Pipelines_Sample'
+    targetPath: $(Build.StagingDirectory)
