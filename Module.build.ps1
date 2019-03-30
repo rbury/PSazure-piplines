@@ -6,9 +6,17 @@
 
 Set-StrictMode -Version Latest
 
-$ModuleName = '{Module_Name}'
-$Compliance = '{Compliance_Score}'
+# Set to proper Module Name and desired compliance for pass
+$ModuleName = 'Module'
+$Compliance = '0'
+$script:moduleManifestFile = (".\$ModuleName\$ModuleName.psd1")
 
+if (-not($env:TF_BUILD)) {
+
+    $env:Build_SourcesDirectory = $PSScriptRoot
+    $env:Common_TestResultsDirectory = "$PSScriptRoot\TestOutPut"
+
+}
 
 # Synopsis: Run full Pipleline
 task . Clean, PreTest, Build, Test, Analyze
@@ -20,11 +28,19 @@ task PreTestOnly PreTest
 task TestAnalyze PreTest, Analyze
 
 # Synopsis: Run full Pipeline with Release
-task Release PreTest, Clean, Build, Test, Analyze, UpdateVersion, Help, Archive
+task Release Clean, PreTest, Build, Test, Analyze, UpdateVersion, Help, Archive
 
 #region Clean
 task Clean {
     # Lets get this cleaned up!
+    if(Test-Path -Path "$env:Build_SourcesDirectory\OutPut") {
+
+        Remove "$env:Build_SourcesDirectory\OutPut"
+
+    }
+
+    New-Item -Path "$evn:Build_SourcesDirectory\Output" -ItemType Directory -Force
+
 }
 #endregion
 
@@ -34,7 +50,7 @@ task Analyze {
 
     $scriptAnalyzerParams = @{
 
-        Path     = "$env:Build_SourcesDirectory/$ModuleName"
+        Path     = "$env:Build_SourcesDirectory/$ModuleName/"
         Severity = @('Error', 'Warning')
         Recurse  = $true
         Verbose  = $false
@@ -60,7 +76,7 @@ task Analyze {
 # Synopsis: Test with Pester, publish results and coverage
 task PreTest {
 
-    Import-Module $env:Build_SourcesDirectory/TopDeskClient/TopDeskClient.psd1
+    Import-Module $env:Build_SourcesDirectory/$ModuleName/$ModuleName.psd1
 
     $invokePesterParams = @{
 
@@ -70,8 +86,8 @@ task PreTest {
         PassThru     = $true
         Verbose      = $false
         EnableExit   = $false
-        CodeCoverage = (Get-ChildItem $env:Build_SourcesDirectory -Recurse -Include '*.psm1', '*.ps1' -Exclude '*.Tests.*').FullName
-        Script       = (Get-ChildItem -Path "$env:Build_SourcesDirectory/" -Recurse -Include '*.tests.ps1' -Depth 5 -Force)
+        CodeCoverage = (Get-ChildItem "$env:Build_SourcesDirectory/$ModuleName" -Recurse -Include '*.psm1', '*.ps1' -Exclude '*.Tests.*').FullName
+        Script       = (Get-ChildItem -Path "$env:Build_SourcesDirectory/tests" -Recurse -Include '*.tests.ps1' -Depth 5 -Force)
 
     }
 
@@ -86,7 +102,7 @@ task PreTest {
 
     # Fail Build if Coverage is under requirement
     $overallCoverage = [Math]::Floor(($testResults.CodeCoverage.NumberOfCommandsExecuted / $testResults.CodeCoverage.NumberOfCommandsAnalyzed) * 100)
-    assert($overallCoverage -gt $Compliance) ('Code Coverage: "{0}", build requirement: "{1}"' -f $overallCoverage, $Compliance)
+    assert($overallCoverage -ge $Compliance) ('Code Coverage: "{0}", build requirement: "{1}"' -f $overallCoverage, $Compliance)
 
 }
 #endregion
@@ -96,10 +112,11 @@ task UpdateVersion {
 
     try {
 
-        $moduleManifestFile = ((($BuildFile -split '\\')[-1] -split '\.')[0] + '.psd1')
         $manifestContent = Get-Content $moduleManifestFile -Raw
-        [version]$version = [regex]::matches($manifestContent, "ModuleVersion\s=\s\'(?<version>(\d+\.)?(\d+\.)?(\*|\d+))") | ForEach-Object {$_.groups['version'].value}
-        $newVersion = "{0}.{1}.{2}" -f $version.Major, $version.Minor, ($version.Build + 1)
+        #[version]$version = [regex]::matches($manifestContent, "ModuleVersion\s=\s\'(?<version>(\d+\.)?(\d+\.)?(\*|\d+))") | ForEach-Object {$_.groups['version'].value}
+        #$newVersion = "{0}.{1}.{2}" -f $version.Major, $version.Minor, ($version.Build + 1)
+
+        $newVersion = (& GitVersion.exe /output json /showvariable SemVer)
 
         $replacements = @{
 
@@ -113,7 +130,7 @@ task UpdateVersion {
 
         }
         
-        $manifestContent | Set-Content -Path "$BuildRoot\$moduleManifestFile"
+        $manifestContent | Set-Content -Path "$env:Build_SourcesDirectory/$script:moduleManifestFile"
 
     } catch {
 
@@ -134,7 +151,7 @@ Task Build {
     }    
 
     Copy-Item -Path "$env:Build_SourcesDirectory/$ModuleName/en-US" -Filter *.xml -Recurse -Destination "$env:Build_SourcesDirectory/Output/$ModuleName/en-US/" -Force -ErrorAction SilentlyContinue
-    Copy-Item -Path "$env:Build_SourcesDirectory/$ModuleName/$ModuleName.psd1" -Destination "$env:Build_SourcesDirectory/Output/$ModuleName/$ModuleName.psd1" -Force
+    Copy-Item -Path "$env:Build_SourcesDirectory/$script:moduleManifestFile" -Destination "$env:Build_SourcesDirectory/Output/$ModuleName/$ModuleName.psd1" -Force
 
     if (-not(Test-Path "$env:Build_SourcesDirectory/Output/$ModuleName/$ModuleName.psm1")) {
 
@@ -168,7 +185,8 @@ Task Test {
 Task Help {
 
     New-ExternalHelp -Path "$env:Build_SourcesDirectory/docs" -OutputPath "$env:Build_SourcesDirectory/Output/$ModuleName/en-US" -Force
-
+    Import-Module "$env:Build_SourcesDirectory\$ModuleName\$ModuleName.psd1" -Force
+    Update-MarkdownHelp "$env:Build_SourcesDirectory\docs"
 }
 #endregion
 
@@ -176,7 +194,7 @@ Task Help {
 # Synopsis: Create Archive
 task Archive {
 
-    Compress-Archive -Path "$env:Build_SourcesDirectory/Output/$ModuleName/" -DestinationPath "$env:Build_StagingDirectory/$ModuleName.zip"
+    Compress-Archive -Path "$env:Build_SourcesDirectory/Output/$ModuleName/" -DestinationPath "$env:Build_SourcesDirectory/Artifacts/$ModuleName.zip"
 
 }
 #endregion
