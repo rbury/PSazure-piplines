@@ -9,7 +9,7 @@ pool:
 
 steps:
 - powershell: .\build.ps1
-  displayName: 'Pre-requisites'
+  displayName: 'Run Build'
 
 - task: PublishTestResults@2
   displayName: 'Publish Test Results'
@@ -17,3 +17,9 @@ steps:
   inputs:
     testResultsFormat: NUnit
     searchFolder: '$(Common.TestResultsDirectory)'
+
+- powershell: Write-Host '##vso[build.addbuildtag]$(GitVersion.SemVer)'
+  displayName: 'Git tag'
+
+- powershell: Write-Host '##vso[build.updatebuildnumber]$(GitVersion.SemVer)'
+  displayName: 'Set the build number'
