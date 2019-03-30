@@ -4,6 +4,9 @@ name: $(TeamProject)_$(Build_SourceVersion)
 trigger:
   - master
 
+pr:
+  - master
+
 pool:
   vmImage: 'vs2017-win2016'
 
