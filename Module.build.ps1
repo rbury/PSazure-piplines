@@ -151,7 +151,7 @@ Task Build {
     }    
 
     Copy-Item -Path "$env:Build_SourcesDirectory/$ModuleName/en-US" -Filter *.xml -Recurse -Destination "$env:Build_SourcesDirectory/Output/$ModuleName/en-US/" -Force -ErrorAction SilentlyContinue
-    Copy-Item -Path "$env:Build_SourcesDirectory/$ModuleName/$ModuleName.psd1" -Destination "$env:Build_SourcesDirectory/Output/$ModuleName/$ModuleName.psd1" -Force
+    Copy-Item -Path "$env:Build_SourcesDirectory\$moduleManifestFile" -Destination "$env:Build_SourcesDirectory/Output/$ModuleName/$ModuleName.psd1" -Force
 
     if (-not(Test-Path "$env:Build_SourcesDirectory/Output/$ModuleName/$ModuleName.psm1")) {
 
