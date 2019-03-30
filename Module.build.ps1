@@ -150,6 +150,7 @@ Task Build {
 
     }    
 
+    Copy-Item -Path "$env:Build_SourcesDirectory/Release-Notes.md" -Destination "$env:Build_SourcesDirectory/Output/Release-Notes.md" -Force
     Copy-Item -Path "$env:Build_SourcesDirectory/$ModuleName/en-US" -Filter *.xml -Recurse -Destination "$env:Build_SourcesDirectory/Output/$ModuleName/en-US/" -Force -ErrorAction SilentlyContinue
     Copy-Item -Path "$env:Build_SourcesDirectory/$script:moduleManifestFile" -Destination "$env:Build_SourcesDirectory/Output/$ModuleName/$ModuleName.psd1" -Force
 
