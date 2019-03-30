@@ -9,7 +9,7 @@ Describe functionone {
     Context 'Numbers' {
         It "Should compare nubmers" {
             2 | Should -be 2
-            2 | Should -be -gt 1
+            2 | Should -gt 1
         }
     }
 
@@ -28,8 +28,8 @@ Describe functionone {
             $result.Count | Should -be 4
             $result[0] | Should -be 1
             $result[1] | Should -be 2
-            $result[2] | Should -be 3
-            $result[3] | Should -be 4
+            $result[2] | Should -be 1
+            $result[3] | Should -be 2
         }
     }
 }
