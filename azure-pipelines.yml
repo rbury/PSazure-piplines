@@ -11,6 +11,17 @@ pool:
   vmImage: 'vs2017-win2016'
 
 steps:
+
+- powershell: |
+   $vernum = & GitVersion.exe /output json /showvariable SemVer
+   Write-Host "##vso[task.setvariable variable=pipeversion]$($vernum)"
+  displayName: SetVersion
+
+- powershell: |
+   Write-Host '##vso[build.addbuildtag]$(PIPEVERSION)'
+   Write-Host '##vso[build.updatebuildnumber]$(PIPEVERSION)'
+  displayName: 'Set Build Tag and Number'
+
 - powershell: .\build.ps1
   displayName: 'Run Build'
 
@@ -20,9 +31,11 @@ steps:
   inputs:
     testResultsFormat: NUnit
     searchFolder: '$(Common.TestResultsDirectory)'
+    mergeTestResults: true
 
-- powershell: Write-Host '##vso[build.addbuildtag]$(GitVersion.SemVer)'
-  displayName: 'Git tag'
-
-- powershell: Write-Host '##vso[build.updatebuildnumber]$(GitVersion.SemVer)'
-  displayName: 'Set the build number'
+- task: CopyFiles@2
+  displayName: 'Copy Files to: Build '
+  inputs:
+    SourceFolder: Output
+    TargetFolder: $(Build.StagingDirectory)
+    CleanTargetFolder: true
