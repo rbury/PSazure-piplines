@@ -111,7 +111,7 @@ task UpdateVersion {
 
     try {
 
-        $moduleManifestFile = (".\$ModuleName\$ModuleName.psd1")
+        $script:moduleManifestFile = (".\$ModuleName\$ModuleName.psd1")
         $manifestContent = Get-Content $moduleManifestFile -Raw
         #[version]$version = [regex]::matches($manifestContent, "ModuleVersion\s=\s\'(?<version>(\d+\.)?(\d+\.)?(\*|\d+))") | ForEach-Object {$_.groups['version'].value}
         #$newVersion = "{0}.{1}.{2}" -f $version.Major, $version.Minor, ($version.Build + 1)
@@ -130,7 +130,7 @@ task UpdateVersion {
 
         }
         
-        $manifestContent | Set-Content -Path "$env:Build_SourcesDirectory\$moduleManifestFile"
+        $manifestContent | Set-Content -Path "$env:Build_SourcesDirectory/$script:moduleManifestFile"
 
     } catch {
 
@@ -151,7 +151,7 @@ Task Build {
     }    
 
     Copy-Item -Path "$env:Build_SourcesDirectory/$ModuleName/en-US" -Filter *.xml -Recurse -Destination "$env:Build_SourcesDirectory/Output/$ModuleName/en-US/" -Force -ErrorAction SilentlyContinue
-    Copy-Item -Path "$env:Build_SourcesDirectory\$moduleManifestFile" -Destination "$env:Build_SourcesDirectory/Output/$ModuleName/$ModuleName.psd1" -Force
+    Copy-Item -Path "$env:Build_SourcesDirectory/$script:moduleManifestFile" -Destination "$env:Build_SourcesDirectory/Output/$ModuleName/$ModuleName.psd1" -Force
 
     if (-not(Test-Path "$env:Build_SourcesDirectory/Output/$ModuleName/$ModuleName.psm1")) {
 
