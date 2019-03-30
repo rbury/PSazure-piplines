@@ -9,6 +9,12 @@ Set-StrictMode -Version Latest
 $ModuleName = '{Module_Name}'
 $Compliance = '{Compliance_Score}'
 
+if (-not($env:TF_BUILD)) {
+
+    $env:Build_SourcesDirectory = $PSScriptRoot
+    $env:Common_TestResultsDirectory = "$PSScriptRoot\TestOutPut"
+
+}
 
 # Synopsis: Run full Pipleline
 task . Clean, PreTest, Build, Test, Analyze
@@ -20,11 +26,19 @@ task PreTestOnly PreTest
 task TestAnalyze PreTest, Analyze
 
 # Synopsis: Run full Pipeline with Release
-task Release PreTest, Clean, Build, Test, Analyze, UpdateVersion, Help, Archive
+task Release Clean, PreTest, Build, Test, Analyze, UpdateVersion, Help, Archive
 
 #region Clean
 task Clean {
     # Lets get this cleaned up!
+    if(Test-Path -Path "$env:Build_SourcesDirectory\OutPut") {
+
+        Remove "$env:Build_SourcesDirectory\OutPut"
+
+    }
+
+    New-Item -Path "$evn:Build_SourcesDirectory\Output" -ItemType Directory -Force
+
 }
 #endregion
 
@@ -168,7 +182,8 @@ Task Test {
 Task Help {
 
     New-ExternalHelp -Path "$env:Build_SourcesDirectory/docs" -OutputPath "$env:Build_SourcesDirectory/Output/$ModuleName/en-US" -Force
-
+    Import-Module "$env:Build_SourcesDirectory\$ModuleName\$ModuleName.psd1" -Force
+    Update-MarkdownHelp "$env:Build_SourcesDirectory\docs"
 }
 #endregion
 
