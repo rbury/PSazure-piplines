@@ -6,8 +6,9 @@
 
 Set-StrictMode -Version Latest
 
-$ModuleName = '{Module_Name}'
-$Compliance = '{Compliance_Score}'
+# Set to proper Module Name and desired compliance for pass
+$ModuleName = 'Module'
+$Compliance = '0'
 
 if (-not($env:TF_BUILD)) {
 
