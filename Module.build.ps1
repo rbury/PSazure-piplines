@@ -9,6 +9,7 @@ Set-StrictMode -Version Latest
 # Set to proper Module Name and desired compliance for pass
 $ModuleName = 'Module'
 $Compliance = '0'
+$script:moduleManifestFile = (".\$ModuleName\$ModuleName.psd1")
 
 if (-not($env:TF_BUILD)) {
 
@@ -111,7 +112,6 @@ task UpdateVersion {
 
     try {
 
-        $script:moduleManifestFile = (".\$ModuleName\$ModuleName.psd1")
         $manifestContent = Get-Content $moduleManifestFile -Raw
         #[version]$version = [regex]::matches($manifestContent, "ModuleVersion\s=\s\'(?<version>(\d+\.)?(\d+\.)?(\*|\d+))") | ForEach-Object {$_.groups['version'].value}
         #$newVersion = "{0}.{1}.{2}" -f $version.Major, $version.Minor, ($version.Build + 1)
