@@ -1,1 +1,20 @@
-// AZP file
+# Docs: https://aka.ms/yaml
+name: $(TeamProject)_$(Build_SourceVersion)
+
+trigger:
+  - master
+
+pool:
+  vmImage: 'vs2017-win2016'
+
+steps:
+- powershell: .\build.ps1
+  displayName: 'Pre-requisites'
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results'
+  condition: always()
+  inputs:
+    #testRunner: NUnit
+    testResultsFormat: NUnit
+    searchFolder: '$(Common.TestResultsDirectory)'
