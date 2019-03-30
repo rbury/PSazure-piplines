@@ -49,7 +49,7 @@ task Analyze {
 
     $scriptAnalyzerParams = @{
 
-        Path     = "$env:Build_SourcesDirectory/$ModuleName"
+        Path     = "$env:Build_SourcesDirectory/$ModuleName/"
         Severity = @('Error', 'Warning')
         Recurse  = $true
         Verbose  = $false
@@ -85,8 +85,8 @@ task PreTest {
         PassThru     = $true
         Verbose      = $false
         EnableExit   = $false
-        CodeCoverage = (Get-ChildItem $env:Build_SourcesDirectory -Recurse -Include '*.psm1', '*.ps1' -Exclude '*.Tests.*').FullName
-        Script       = (Get-ChildItem -Path "$env:Build_SourcesDirectory/" -Recurse -Include '*.tests.ps1' -Depth 5 -Force)
+        CodeCoverage = (Get-ChildItem "$env:Build_SourcesDirectory/$ModuleName" -Recurse -Include '*.psm1', '*.ps1' -Exclude '*.Tests.*').FullName
+        Script       = (Get-ChildItem -Path "$env:Build_SourcesDirectory/tests" -Recurse -Include '*.tests.ps1' -Depth 5 -Force)
 
     }
 
@@ -101,7 +101,7 @@ task PreTest {
 
     # Fail Build if Coverage is under requirement
     $overallCoverage = [Math]::Floor(($testResults.CodeCoverage.NumberOfCommandsExecuted / $testResults.CodeCoverage.NumberOfCommandsAnalyzed) * 100)
-    assert($overallCoverage -gt $Compliance) ('Code Coverage: "{0}", build requirement: "{1}"' -f $overallCoverage, $Compliance)
+    assert($overallCoverage -ge $Compliance) ('Code Coverage: "{0}", build requirement: "{1}"' -f $overallCoverage, $Compliance)
 
 }
 #endregion
