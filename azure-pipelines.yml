@@ -15,6 +15,5 @@ steps:
   displayName: 'Publish Test Results'
   condition: always()
   inputs:
-    #testRunner: NUnit
     testResultsFormat: NUnit
     searchFolder: '$(Common.TestResultsDirectory)'
