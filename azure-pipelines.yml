@@ -29,7 +29,7 @@ steps:
   displayName: 'Publish Test Results'
   condition: always()
   inputs:
-    testResultsFiles: 
+    testResultsFiles: '**/TEST-*.xml'
     testResultsFormat: NUnit
     searchFolder: '$(Common.TestResultsDirectory)'
     mergeTestResults: true
