@@ -74,7 +74,7 @@ task Analyze {
 # Synopsis: Test with Pester, publish results and coverage
 task PreTest {
 
-    Import-Module $env:Build_SourcesDirectory/TopDeskClient/TopDeskClient.psd1
+    Import-Module $env:Build_SourcesDirectory/$ModuleName/$ModuleName.psd1
 
     $invokePesterParams = @{
 
@@ -110,10 +110,12 @@ task UpdateVersion {
 
     try {
 
-        $moduleManifestFile = ((($BuildFile -split '\\')[-1] -split '\.')[0] + '.psd1')
+        $moduleManifestFile = (".\$ModuleName\$ModuleName.psd1")
         $manifestContent = Get-Content $moduleManifestFile -Raw
-        [version]$version = [regex]::matches($manifestContent, "ModuleVersion\s=\s\'(?<version>(\d+\.)?(\d+\.)?(\*|\d+))") | ForEach-Object {$_.groups['version'].value}
-        $newVersion = "{0}.{1}.{2}" -f $version.Major, $version.Minor, ($version.Build + 1)
+        #[version]$version = [regex]::matches($manifestContent, "ModuleVersion\s=\s\'(?<version>(\d+\.)?(\d+\.)?(\*|\d+))") | ForEach-Object {$_.groups['version'].value}
+        #$newVersion = "{0}.{1}.{2}" -f $version.Major, $version.Minor, ($version.Build + 1)
+
+        $newVersion = (& GitVersion.exe /output json /showvariable SemVer)
 
         $replacements = @{
 
@@ -127,7 +129,7 @@ task UpdateVersion {
 
         }
         
-        $manifestContent | Set-Content -Path "$BuildRoot\$moduleManifestFile"
+        $manifestContent | Set-Content -Path "$env:Build_SourcesDirectory\$moduleManifestFile"
 
     } catch {
 
@@ -191,7 +193,7 @@ Task Help {
 # Synopsis: Create Archive
 task Archive {
 
-    Compress-Archive -Path "$env:Build_SourcesDirectory/Output/$ModuleName/" -DestinationPath "$env:Build_StagingDirectory/$ModuleName.zip"
+    Compress-Archive -Path "$env:Build_SourcesDirectory/Output/$ModuleName/" -DestinationPath "$env:Build_SourcesDirectory/Artifacts/$ModuleName.zip"
 
 }
 #endregion
