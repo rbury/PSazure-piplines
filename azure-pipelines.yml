@@ -30,14 +30,6 @@ steps:
 - powershell: Invoke-Build -Task Release
   displayName: 'Run Build'
 
-- task: nkdagility.gittasks.gitsync-task.gitsync@1
-  displayName: 'Sync Repo'
-  inputs:
-    targetType: github
-    githubEndpointId: 'rbury'
-    repositoryName: 'rbury/PSazure-piplines'
-
-
 - task: PublishTestResults@2
   displayName: 'Publish Test Results'
   condition: always()
