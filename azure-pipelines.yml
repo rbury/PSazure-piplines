@@ -34,7 +34,7 @@ steps:
   displayName: 'Sync Repo'
   inputs:
     targetType: github
-    githubEndpointId: 'github connection 1'
+    githubEndpointId: 'rbury'
     repositoryName: 'rbury/PSazure-piplines'
 
 
