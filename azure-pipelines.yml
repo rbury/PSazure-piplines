@@ -27,8 +27,8 @@ steps:
 - powershell: .\pre-build.ps1
   displayName: 'Run Build'
 
-- powershell: Invoke-Build -Task TestAnalyze
-  displayName: 'Run Tests & Analyze'
+- powershell: Invoke-Build
+  displayName: 'Run Build'
 
 - task: PublishTestResults@2
   displayName: 'Publish Test Results'
