@@ -4,32 +4,25 @@ name: $(SourceBranchName)_$(Build_SourceVersion)
 variables:
 - group: AZ-Pipe-Versions
 
-trigger:
-  - master
-
-pr:
-  - master
-
 pool:
   vmImage: 'vs2017-win2016'
 
 steps:
 
+- powershell: |
+   $vernum = & GitVersion.exe /output json /showvariable SemVer
+   Write-Host "##vso[task.setvariable variable=PIPEVERSION]$($vernum)"
+  displayName: SetVersion
 
-#- powershell: |
-#   $vernum = & GitVersion.exe /output json /showvariable SemVer
-#   Write-Host "##vso[task.setvariable variable=PIPEVERSION]$($vernum)"
-#  displayName: SetVersion
+- powershell: |
+   $shanum = & GitVersion.exe /output json /showvariable Sha
+   Write-Host "##vso[task.setvariable variable=SHAVERSION]$($shanum)"
+  displayName: SetSha
 
-#- powershell: |
-#   $shanum = & GitVersion.exe /output json /showvariable Sha
-#   Write-Host "##vso[task.setvariable variable=SHAVERSION]$($shanum)"
-#  displayName: SetSha
-
-#- powershell: |
-#   Write-Host '##vso[build.addbuildtag]$(PIPEVERSION)'
-#   Write-Host '##vso[build.updatebuildnumber]$(PIPEVERSION)'
-#  displayName: 'Set Build Tag and Number'
+- powershell: |
+   Write-Host '##vso[build.addbuildtag]$(PIPEVERSION)'
+   Write-Host '##vso[build.updatebuildnumber]$(PIPEVERSION)'
+  displayName: 'Set Build Tag and Number'
 
 - powershell: .\pre-build.ps1
   displayName: 'Run Build'
@@ -46,15 +39,15 @@ steps:
     searchFolder: '$(Common.TestResultsDirectory)'
     mergeTestResults: true
 
-#- task: CopyFiles@2
-#  displayName: 'Copy Files to: Build '
-#  inputs:
-#    Contents: '**\*'
-#    SourceFolder: Output
-#    TargetFolder: $(Build.StagingDirectory)
-#    CleanTargetFolder: true
+- task: CopyFiles@2
+  displayName: 'Copy Files to: Build '
+  inputs:
+    Contents: '**\*'
+    SourceFolder: Output
+    TargetFolder: $(Build.StagingDirectory)
+    CleanTargetFolder: true
 
-#- task: PublishPipelineArtifact@0
-#  inputs:
-#    artifactName: 'Pipelines_Sample'
-#    targetPath: $(Build.StagingDirectory)
+- task: PublishPipelineArtifact@0
+  inputs:
+    artifactName: 'Pipelines_Sample'
+    targetPath: $(Build.StagingDirectory)
