@@ -28,7 +28,7 @@ task PreTestOnly PreTest
 task TestAnalyze PreTest, Analyze
 
 # Synopsis: Run full Pipeline with Release
-task Release Clean, PreTest, Build, Test, Analyze, UpdateVersion, Help, UpdateRepo, Archive
+task Release Clean, PreTest, Build, Test, Analyze, UpdateVersion, Help, Archive
 
 #region Clean
 task Clean {
@@ -192,19 +192,9 @@ Task Test {
 Task Help {
 
     Import-Module "$env:Build_SourcesDirectory/$ModuleName/$ModuleName.psd1" -Force
+    New-MarkdownHelp -Module $ModuleName -Force -OutputFolder "$env:Build_SourcesDirectory/docs" -ErrorAction SilentlyContinue
     Update-MarkdownHelp "$env:Build_SourcesDirectory/docs" -ErrorAction SilentlyContinue
     New-ExternalHelp -Path "$env:Build_SourcesDirectory/docs" -OutputPath "$env:Build_SourcesDirectory/Output/$ModuleName/en-US" -Force -ErrorAction SilentlyContinue
-
-}
-#endregion
-
-#region UpdateRepo
-Task UpdateRepo {
-
-    # check that we have changed files
-    exec { git commit -a -m 'Version bump [skip ci]' }
-    $changes = exec { git status --short }
-    assert (!$changes) "Please, commit changes."
 
 }
 #endregion
