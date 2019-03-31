@@ -28,7 +28,7 @@ task PreTestOnly PreTest
 task TestAnalyze PreTest, Analyze
 
 # Synopsis: Run full Pipeline with Release
-task Release Clean, PreTest, Build, Test, Analyze, UpdateVersion, Help, Archive
+task Release Clean, PreTest, Build, Test, Analyze, UpdateVersion, Archive
 
 #region Clean
 task Clean {
