@@ -21,6 +21,11 @@ steps:
   displayName: SetVersion
 
 - powershell: |
+   $shanum = & GitVersion.exe /output json /showvariable Sha
+   Write-Host "##vso[task.setvariable variable=shaversion]$($shanum)"
+  displayName: SetSha
+
+- powershell: |
    Write-Host '##vso[build.addbuildtag]$(PIPEVERSION)'
    Write-Host '##vso[build.updatebuildnumber]$(PIPEVERSION)'
   displayName: 'Set Build Tag and Number'
