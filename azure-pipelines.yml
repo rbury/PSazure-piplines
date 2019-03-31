@@ -4,12 +4,6 @@ name: $(SourceBranchName)_$(Build_SourceVersion)
 variables:
 - group: AZ-Pipe-Versions
 
-trigger:
-  - master
-
-pr:
-  - master
-
 pool:
   vmImage: 'vs2017-win2016'
 
@@ -17,12 +11,12 @@ steps:
 
 - powershell: |
    $vernum = & GitVersion.exe /output json /showvariable SemVer
-   Write-Host "##vso[task.setvariable variable=pipeversion]$($vernum)"
+   Write-Host "##vso[task.setvariable variable=PIPEVERSION]$($vernum)"
   displayName: SetVersion
 
 - powershell: |
    $shanum = & GitVersion.exe /output json /showvariable Sha
-   Write-Host "##vso[task.setvariable variable=shaversion]$($shanum)"
+   Write-Host "##vso[task.setvariable variable=SHAVERSION]$($shanum)"
   displayName: SetSha
 
 - powershell: |
@@ -30,8 +24,11 @@ steps:
    Write-Host '##vso[build.updatebuildnumber]$(PIPEVERSION)'
   displayName: 'Set Build Tag and Number'
 
-- powershell: .\build.ps1
+- powershell: .\pre-build.ps1
   displayName: 'Run Build'
+
+- powershell: Invoke-Build -Task TestAnalyze
+  displayName: 'Run Tests & Analyze'
 
 - task: PublishTestResults@2
   displayName: 'Publish Test Results'
