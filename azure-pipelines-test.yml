@@ -9,7 +9,7 @@ pool:
 
 steps:
 
-- powershell: .\pre-build.ps1
+- powershell: .\pre-build-test.ps1
   displayName: 'Run Build'
 
 - powershell: Invoke-Build -Task TestAnalyze
