@@ -126,7 +126,7 @@ task UpdateVersion {
         $replacements = @{
 
             "ModuleVersion = '.*'" = "ModuleVersion = '$newVersion'"
-            "FunctionsToExport = @()" = "FunctionsToExport = '@($PublicFunctions)"  
+            "FunctionsToExport = @()" = "FunctionsToExport = '@($PublicFunctions)'"
 
         }
 
