@@ -192,8 +192,8 @@ Task Test {
 Task Help {
 
     Import-Module "$env:Build_SourcesDirectory/$ModuleName/$ModuleName.psd1" -Force
-    Update-MarkdownHelp "$env:Build_SourcesDirectory/docs"
-    New-ExternalHelp -Path "$env:Build_SourcesDirectory/docs" -OutputPath "$env:Build_SourcesDirectory/Output/$ModuleName/en-US" -Force
+    Update-MarkdownHelp "$env:Build_SourcesDirectory/docs" -ErrorAction SilentlyContinue
+    New-ExternalHelp -Path "$env:Build_SourcesDirectory/docs" -OutputPath "$env:Build_SourcesDirectory/Output/$ModuleName/en-US" -Force -ErrorAction SilentlyContinue
 
 }
 #endregion
