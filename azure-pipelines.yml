@@ -15,23 +15,27 @@ pool:
 
 steps:
 
-- powershell: |
-   $vernum = & GitVersion.exe /output json /showvariable SemVer
-   Write-Host "##vso[task.setvariable variable=pipeversion]$($vernum)"
-  displayName: SetVersion
 
-- powershell: |
-   $shanum = & GitVersion.exe /output json /showvariable Sha
-   Write-Host "##vso[task.setvariable variable=shaversion]$($shanum)"
-  displayName: SetSha
+#- powershell: |
+#   $vernum = & GitVersion.exe /output json /showvariable SemVer
+#   Write-Host "##vso[task.setvariable variable=PIPEVERSION]$($vernum)"
+#  displayName: SetVersion
 
-- powershell: |
-   Write-Host '##vso[build.addbuildtag]$(PIPEVERSION)'
-   Write-Host '##vso[build.updatebuildnumber]$(PIPEVERSION)'
-  displayName: 'Set Build Tag and Number'
+#- powershell: |
+#   $shanum = & GitVersion.exe /output json /showvariable Sha
+#   Write-Host "##vso[task.setvariable variable=SHAVERSION]$($shanum)"
+#  displayName: SetSha
 
-- powershell: .\build.ps1
+#- powershell: |
+#   Write-Host '##vso[build.addbuildtag]$(PIPEVERSION)'
+#   Write-Host '##vso[build.updatebuildnumber]$(PIPEVERSION)'
+#  displayName: 'Set Build Tag and Number'
+
+- powershell: .\pre-build.ps1
   displayName: 'Run Build'
+
+- powershell: .\invoke-build -Task TestAnalyze
+  displayName: 'Run Tests & Analyze'
 
 - task: PublishTestResults@2
   displayName: 'Publish Test Results'
@@ -42,15 +46,15 @@ steps:
     searchFolder: '$(Common.TestResultsDirectory)'
     mergeTestResults: true
 
-- task: CopyFiles@2
-  displayName: 'Copy Files to: Build '
-  inputs:
-    Contents: '**\*'
-    SourceFolder: Output
-    TargetFolder: $(Build.StagingDirectory)
-    CleanTargetFolder: true
+#- task: CopyFiles@2
+#  displayName: 'Copy Files to: Build '
+#  inputs:
+#    Contents: '**\*'
+#    SourceFolder: Output
+#    TargetFolder: $(Build.StagingDirectory)
+#    CleanTargetFolder: true
 
-- task: PublishPipelineArtifact@0
-  inputs:
-    artifactName: 'Pipelines_Sample'
-    targetPath: $(Build.StagingDirectory)
+#- task: PublishPipelineArtifact@0
+#  inputs:
+#    artifactName: 'Pipelines_Sample'
+#    targetPath: $(Build.StagingDirectory)
