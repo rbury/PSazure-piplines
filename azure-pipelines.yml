@@ -1,6 +1,9 @@
 # Docs: https://aka.ms/yaml
 name: $(SourceBranchName)_$(Build_SourceVersion)
 
+variables:
+- group: AZ-Pipe-Versions
+
 trigger:
   - master
 
