@@ -121,7 +121,7 @@ task UpdateVersion {
         # Get list of public functions
         $Public  = @( Get-ChildItem -Path ".\$ModuleName\Public\*.ps1" -ErrorAction SilentlyContinue )
         # Prepare comma list of public funtion names for psd1 functions to export
-        $PublicFunctions = $($Public.BaseName -join "', '")
+        $PublicFunctions = "'$($Public.BaseName -join "', '")'"
 
         $replacements = @{
 

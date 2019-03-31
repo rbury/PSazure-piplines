@@ -25,7 +25,7 @@ steps:
   displayName: 'Set Build Tag and Number'
 
 - powershell: .\pre-build.ps1
-  displayName: 'Run Build'
+  displayName: 'Run Pre-Build'
 
 - powershell: Invoke-Build -Task Release
   displayName: 'Run Build'
