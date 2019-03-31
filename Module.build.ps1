@@ -28,7 +28,7 @@ task PreTestOnly PreTest
 task TestAnalyze PreTest, Analyze
 
 # Synopsis: Run full Pipeline with Release
-task Release Clean, PreTest, Build, Test, Analyze, UpdateVersion, Help, Archive
+task Release Clean, PreTest, Build, Test, Analyze, UpdateVersion, Help, UpdateRepo, Archive
 
 #region Clean
 task Clean {
@@ -116,11 +116,17 @@ task UpdateVersion {
         #[version]$version = [regex]::matches($manifestContent, "ModuleVersion\s=\s\'(?<version>(\d+\.)?(\d+\.)?(\*|\d+))") | ForEach-Object {$_.groups['version'].value}
         #$newVersion = "{0}.{1}.{2}" -f $version.Major, $version.Minor, ($version.Build + 1)
 
+        # Set new version from repo
         $newVersion = (& GitVersion.exe /output json /showvariable SemVer)
+        # Get list of public functions
+        $Public  = @( Get-ChildItem -Path ".\$ModuleName\Public\*.ps1" -ErrorAction SilentlyContinue )
+        # Prepare comma list of public funtion names for psd1 functions to export
+        $PublicFunctions = $($Public.BaseName -join "', '")
 
         $replacements = @{
 
-            "ModuleVersion = '.*'" = "ModuleVersion = '$newVersion'"     
+            "ModuleVersion = '.*'" = "ModuleVersion = '$newVersion'"
+            "FunctionsToExport = @()" = "FunctionsToExport = '@($PublicFunctions)"  
 
         }
 
@@ -185,9 +191,21 @@ Task Test {
 #region Help
 Task Help {
 
+    Import-Module "$env:Build_SourcesDirectory/$ModuleName/$ModuleName.psd1" -Force
+    Update-MarkdownHelp "$env:Build_SourcesDirectory/docs"
     New-ExternalHelp -Path "$env:Build_SourcesDirectory/docs" -OutputPath "$env:Build_SourcesDirectory/Output/$ModuleName/en-US" -Force
-    Import-Module "$env:Build_SourcesDirectory\$ModuleName\$ModuleName.psd1" -Force
-    Update-MarkdownHelp "$env:Build_SourcesDirectory\docs"
+
+}
+#endregion
+
+#region UpdateRepo
+Task UpdateRepo {
+
+    # check that we have changed files
+    exec { git commit -a -m 'Version bump [skip ci]' }
+    $changes = exec { git status --short }
+    assert (!$changes) "Please, commit changes."
+
 }
 #endregion
 
