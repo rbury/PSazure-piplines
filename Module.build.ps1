@@ -203,7 +203,7 @@ Task Help {
 # Synopsis: Create Archive
 task Archive {
 
-    Compress-Archive -Path "$env:Build_SourcesDirectory/Output/$ModuleName/" -DestinationPath "$env:Build_SourcesDirectory/Artifacts/$ModuleName.zip"
+    Compress-Archive -Path "$env:Build_SourcesDirectory/Output/$ModuleName/" -DestinationPath "$env:Build_SourcesDirectory/Output/$ModuleName.zip"
 
 }
 #endregion
