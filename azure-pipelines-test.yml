@@ -10,7 +10,7 @@ pool:
 steps:
 
 - powershell: .\pre-build-test.ps1
-  displayName: 'Run Build'
+  displayName: 'Run Pre-Build'
 
 - powershell: Invoke-Build -Task TestAnalyze
   displayName: 'Run Tests & Analyze'
