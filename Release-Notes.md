@@ -1,3 +1,3 @@
 # PSAzure-Piplines Release Notes
 
-Inital Pre-Release
+0.1.2
