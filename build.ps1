@@ -27,7 +27,7 @@ try {
 
 $RequiredModules | Import-Module
 
-Invoke-Build -Result Result
+#Invoke-Build -Result Result
 
 # Show task summary information after the build
-$Result.Tasks | Format-Table Elapsed, Name, Error -AutoSize
+#$Result.Tasks | Format-Table Elapsed, Name, Error -AutoSize
