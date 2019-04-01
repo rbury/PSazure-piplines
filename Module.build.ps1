@@ -169,7 +169,7 @@ Task Build {
     Get-ChildItem -Path "$env:Build_SourcesDirectory/$ModuleName/Private/*.ps1" -Recurse | Get-Content | Add-Content "$env:Build_SourcesDirectory/Output/$ModuleName/$ModuleName.psm1" -Force
     $Public = @( Get-ChildItem -Path "$env:Build_SourcesDirectory/$ModuleName/Public/*.ps1" -ErrorAction SilentlyContinue -Force )
     $Public | Get-Content | Add-Content "$env:Build_SourcesDirectory/Output/$ModuleName/$ModuleName.psm1" -Force
-    "`$PublicFunctions = '$($Public.BaseName -join "', '")'" | Add-Content "$env:Build_SourcesDirectory/Output/$ModuleName/$ModuleName.psm1" -Force
+    #"`$PublicFunctions = '$($Public.BaseName -join "', '")'" | Add-Content "$env:Build_SourcesDirectory/Output/$ModuleName/$ModuleName.psm1" -Force
 
 }
 #endregion
