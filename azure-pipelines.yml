@@ -42,17 +42,25 @@ steps:
 - task: CopyFiles@2
   displayName: 'Copy Files to: Build '
   inputs:
-    Contents: '**\*'
+    Contents: '**/*.zip'
     SourceFolder: Output
     TargetFolder: $(Build.StagingDirectory)
     CleanTargetFolder: true
 
+- task: CopyFiles@2
+  displayName: 'Copy Files to: Build '
+  inputs:
+    Contents: '**/Release-Notes.md'
+    SourceFolder: Output
+    TargetFolder: $(Build.StagingDirectory)
+    CleanTargetFolder: false
+
 - task: PublishPipelineArtifact@0
   inputs:
     artifactName: 'Pipelines_Sample'
-    targetPath: $(Build.StagingDirectory)/Output/module.zip
+    targetPath: $(Build.StagingDirectory)/module.zip
 
 - task: PublishPipelineArtifact@0
   inputs:
     artifactName: 'Pipelines_Release'
-    targetPath: $(Build.StagingDirectory)/Output/Release-Notes.md
+    targetPath: $(Build.StagingDirectory)/Release-Notes.md
