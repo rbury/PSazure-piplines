@@ -50,9 +50,9 @@ steps:
 - task: PublishPipelineArtifact@0
   inputs:
     artifactName: 'Pipelines_Sample'
-    targetPath: $(Build.StagingDirectory)/module.zip
+    targetPath: $(Build.StagingDirectory)/Output/module.zip
 
 - task: PublishPipelineArtifact@0
   inputs:
     artifactName: 'Pipelines_Release'
-    targetPath: $(Build.StagingDirectory)/Release-Notes.md
+    targetPath: $(Build.StagingDirectory)/Output/Release-Notes.md
